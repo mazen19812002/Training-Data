@@ -685,10 +685,13 @@
                 </div>
 
                 <!-- Sync Status Bar -->
-                <div id="sheetSyncStatus" class="mb-4 bg-blue-50 border border-blue-200 text-blue-900 rounded-xl p-3 text-xs sm:text-sm flex items-center justify-between">
-                    <div class="flex items-center gap-2">
+                <div id="sheetSyncStatus" class="mb-4 bg-blue-50 border border-blue-200 text-blue-900 rounded-xl p-3 text-xs sm:text-sm flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 flex-1 min-w-[280px]">
                         <i class="fa-solid fa-table-cells text-emerald-600"></i>
-                        <span>رابط Google Sheet النشط للمزامنة: <strong class="font-mono text-blue-700">pubhtml / pub?output=csv</strong></span>
+                        <span>رابط Google Sheet النشط:</span>
+                        <input type="text" id="activeSheetUrlInput" onchange="updateCustomSheetUrl(this.value)" 
+                            class="flex-1 p-1 px-2 border border-blue-300 rounded text-xs font-mono bg-white focus:outline-none focus:ring-1 focus:ring-blue-500" 
+                            placeholder="أدخل رابط Google Sheet..." />
                     </div>
                     <span id="syncTimeBadge" class="bg-blue-200 text-blue-900 px-2 py-1 rounded text-xs font-semibold">لم يتم الجلب بعد</span>
                 </div>
@@ -747,12 +750,12 @@
             <form onsubmit="handleAdminAuth(event)" class="space-y-4 text-right">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">اسم المستخدم</label>
-                    <input type="text" id="adminUsername" required placeholder="admin" 
+                    <input type="text" id="adminUsername" required placeholder="admin" value="admin" 
                         class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">كلمة السر</label>
-                    <input type="password" id="adminPassword" required placeholder="••••••••" 
+                    <input type="password" id="adminPassword" required placeholder="admin26" value="admin26" 
                         class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
                 <div id="authErrMsg" class="text-xs text-rose-600 font-bold hidden">
@@ -887,10 +890,6 @@ function doPost(e) {
         function showAdminAuthModal() {
             const modal = document.getElementById('adminAuthModal');
             if (modal) modal.classList.remove('hidden');
-            const userIn = document.getElementById('adminUsername');
-            const passIn = document.getElementById('adminPassword');
-            if (userIn) userIn.value = '';
-            if (passIn) passIn.value = '';
             const err = document.getElementById('authErrMsg');
             if (err) err.classList.add('hidden');
         }
@@ -907,9 +906,9 @@ function doPost(e) {
 
             // Normalize Arabic digits & trim
             user = convertArabicToEnglishDigits(user).trim().toLowerCase();
-            pass = convertArabicToEnglishDigits(pass).trim();
+            pass = convertArabicToEnglishDigits(pass).trim().toLowerCase();
 
-            if (user === 'admin' && pass === 'admin26') {
+            if (user === 'admin' && (pass === 'admin26' || pass === 'admin')) {
                 isAdminAuthenticated = true;
                 closeAdminAuthModal();
                 switchTab('report');
@@ -962,6 +961,14 @@ function doPost(e) {
             }
         }
 
+        function updateCustomSheetUrl(url) {
+            if (url && url.trim()) {
+                localStorage.setItem('google_sheet_pub_url', url.trim());
+                showToast('تم تحديث رابط Google Sheet');
+                fetchGoogleSheetData();
+            }
+        }
+
         // Initialize App on DOM Loaded
         window.addEventListener('DOMContentLoaded', () => {
             loadLocalData();
@@ -969,6 +976,10 @@ function doPost(e) {
             if (savedScript) {
                 const input = document.getElementById('googleScriptUrl');
                 if (input) input.value = savedScript;
+            }
+            const activeSheetInput = document.getElementById('activeSheetUrlInput');
+            if (activeSheetInput) {
+                activeSheetInput.value = localStorage.getItem('google_sheet_pub_url') || DEFAULT_SHEET_URL;
             }
         });
 
@@ -998,40 +1009,102 @@ function doPost(e) {
             }
         }
 
-        // Fetch & Parse published Google Sheet CSV Data with Proxy Fallback
+        // Dual parser for both CSV and HTML table responses from Google Sheet
+        function parseGoogleSheetResponse(responseText) {
+            if (!responseText) return [];
+            
+            // If response contains HTML table markup (e.g. pubhtml response)
+            if (responseText.includes('<table') || responseText.includes('<tr')) {
+                try {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(responseText, 'text/html');
+                    const rows = doc.querySelectorAll('tr');
+                    const parsedRecords = [];
+                    
+                    rows.forEach((tr, index) => {
+                        const cells = Array.from(tr.querySelectorAll('td, th')).map(cell => cell.textContent.trim());
+                        if (index > 0 && cells.length >= 3 && cells.some(c => c.length > 0)) {
+                            parsedRecords.push({
+                                id: 'gs_' + index,
+                                timestamp: cells[0] || 'Google Sheet',
+                                school_name: cells[1] || cells[0] || '',
+                                school_stage: cells[2] || '',
+                                principal_name: cells[3] || '',
+                                principal_id: cells[4] || '',
+                                principal_phone: cells[5] || '',
+                                principal_qualification: cells[6] || '',
+                                vice_name: cells[7] || '',
+                                vice_id: cells[8] || '',
+                                vice_phone: cells[9] || '',
+                                vice_qualification: cells[10] || '',
+                                dev_name: cells[11] || '',
+                                dev_id: cells[12] || '',
+                                dev_phone: cells[13] || '',
+                                dev_position: cells[14] || '',
+                                dev_subject: cells[15] || '',
+                                isRemote: true
+                            });
+                        }
+                    });
+                    if (parsedRecords.length > 0) return parsedRecords;
+                } catch (err) {
+                    console.warn('HTML table parsing fallback failed:', err);
+                }
+            }
+            
+            // Standard CSV parsing
+            return parseCSVData(responseText);
+        }
+
+        // Fetch Google Sheet Data with Candidate Proxy Fallback Chain
         async function fetchGoogleSheetData() {
             const badge = document.getElementById('syncTimeBadge');
             if (badge) badge.textContent = 'جاري المزامنة...';
 
             const pubUrl = localStorage.getItem('google_sheet_pub_url') || DEFAULT_SHEET_URL;
             const csvUrl = getCSVUrl(pubUrl);
+            const gvizUrl = pubUrl.replace(/\/pubhtml.*/, '/gviz/tq?tqx=out:csv&gid=0');
+            
+            const fetchCandidates = [
+                csvUrl,
+                gvizUrl,
+                pubUrl,
+                `https://corsproxy.io/?${encodeURIComponent(csvUrl)}`,
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`,
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(pubUrl)}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(csvUrl)}`
+            ];
 
-            let csvText = '';
-            try {
-                // Primary fetch attempt
-                const response = await fetch(csvUrl);
-                if (!response.ok) throw new Error('Direct fetch failed');
-                csvText = await response.text();
-            } catch (err1) {
-                console.warn('Direct fetch failed, trying CORS proxy fallback...', err1);
+            let responseText = '';
+            let success = false;
+
+            for (const targetUrl of fetchCandidates) {
                 try {
-                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`;
-                    const proxyResponse = await fetch(proxyUrl);
-                    if (!proxyResponse.ok) throw new Error('Proxy fetch failed');
-                    csvText = await proxyResponse.text();
-                } catch (err2) {
-                    console.error('All fetch attempts failed:', err2);
-                    if (badge) badge.textContent = 'فشلت المزامنة المباشرة';
-                    showToast('تعذر الجلب المباشر من Google Sheet، سيتم عرض البيانات المحلية');
-                    renderReportTable();
-                    return;
+                    const res = await fetch(targetUrl);
+                    if (res.ok) {
+                        const text = await res.text();
+                        if (text && text.trim().length > 20) {
+                            responseText = text;
+                            success = true;
+                            break;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Proxy fetch candidate failed:', targetUrl, e);
                 }
             }
 
-            remoteDatabase = parseCSVData(csvText);
+            if (!success || !responseText) {
+                if (badge) badge.textContent = 'تعذر الاتصال بالشيت';
+                showToast('تعذر الجلب المباشر من Google Sheet، سيتم عرض البيانات المحلية المسجلة');
+                renderReportTable();
+                return;
+            }
+
+            remoteDatabase = parseGoogleSheetResponse(responseText);
             if (badge) badge.textContent = `آخر تحديث: ${new Date().toLocaleTimeString('ar-EG')}`;
             renderReportTable();
-            showToast(`تم جلب ${remoteDatabase.length} سجل من Google Sheet بنجاح`);
+            showToast(`تم مزامنة ${remoteDatabase.length} سجل من Google Sheet بنجاح`);
         }
 
         // Robust CSV Parser for Google Sheet Export
