@@ -831,7 +831,8 @@ function doPost(e) {
         let remoteDatabase = [];
         let zoomLevel = 1;
         let isAdminAuthenticated = false;
-        const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnk0EAZg9hlBwXamZ7bNHEY0PBMDsffKMRlg9wBTNkdImU7gdxTX_U-toUu4JAV7XGAUTT0jKUtZi/pubhtml?gid=0&single=true";
+        const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnk0EAZg9hlBwXamZ7bNHEY0PBMDsffKMRlg9wBTNkdImU7gdxTX_U-toUu4JAV7XGAUTT0jKUtZi/pubhtml";
+        const EDITOR_SHEET_ID = "1PdDK3l35YedfLLz9CrwOt1dg_pJjsQKuwdO8QhXbnRo";
 
         // Normalize Arabic digits to English digits
         function convertArabicToEnglishDigits(str) {
@@ -840,10 +841,13 @@ function doPost(e) {
             return String(str).replace(/[٠-٩]/g, d => arabicDigits.indexOf(d));
         }
 
-        // Convert any published Google Sheet URL into a direct CSV download link
+        // Convert any published or edit Google Sheet URL into a direct CSV download link
         function getCSVUrl(url) {
             if (!url) return '';
             let csvUrl = url.trim();
+            if (csvUrl.includes('/edit')) {
+                return csvUrl.replace(/\/edit.*/, '/gviz/tq?tqx=out:csv');
+            }
             if (csvUrl.includes('/pubhtml')) {
                 csvUrl = csvUrl.replace('/pubhtml', '/pub');
             }
@@ -1063,13 +1067,17 @@ function doPost(e) {
 
             const pubUrl = localStorage.getItem('google_sheet_pub_url') || DEFAULT_SHEET_URL;
             const csvUrl = getCSVUrl(pubUrl);
+            const directGvizUrl = `https://docs.google.com/spreadsheets/d/${EDITOR_SHEET_ID}/gviz/tq?tqx=out:csv`;
             const gvizUrl = pubUrl.replace(/\/pubhtml.*/, '/gviz/tq?tqx=out:csv&gid=0');
             
             const fetchCandidates = [
                 csvUrl,
+                directGvizUrl,
                 gvizUrl,
                 pubUrl,
+                `https://corsproxy.io/?${encodeURIComponent(directGvizUrl)}`,
                 `https://corsproxy.io/?${encodeURIComponent(csvUrl)}`,
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(directGvizUrl)}`,
                 `https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`,
                 `https://api.allorigins.win/raw?url=${encodeURIComponent(pubUrl)}`,
                 `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(csvUrl)}`
