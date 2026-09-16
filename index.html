@@ -526,12 +526,20 @@
                             تقرير مدير الصفحة - سجل بيانات التنمية المهنية
                         </h2>
                         <p class="text-sm text-gray-600 mt-1">
-                            عرض واسترجاع كافة البيانات المسجلة محلياً والمزامنة مع السجل الرئيسي.
+                            عرض واسترجاع كافة البيانات المسجلة محلياً والمزامنة المباشرة مع جوجل شيت.
                         </p>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="fetchGoogleSheetData()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition shadow">
+                            <i class="fa-solid fa-cloud-arrow-down"></i>
+                            مزامنة من شيت جوجل
+                        </button>
+                        <button onclick="showGoogleScriptModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition shadow">
+                            <i class="fa-solid fa-plug"></i>
+                            إعداد رابط الحفظ للشيت
+                        </button>
                         <button onclick="lockAdminTab()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition">
                             <i class="fa-solid fa-lock"></i>
                             قفل التقرير
@@ -545,6 +553,15 @@
                             مسح السجل المحلي
                         </button>
                     </div>
+                </div>
+
+                <!-- Sync Status Bar -->
+                <div id="sheetSyncStatus" class="mb-4 bg-blue-50 border border-blue-200 text-blue-900 rounded-xl p-3 text-xs sm:text-sm flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-table-cells text-emerald-600"></i>
+                        <span>رابط Google Sheet النشط للمزامنة: <strong class="font-mono text-blue-700">pubhtml / pub?output=csv</strong></span>
+                    </div>
+                    <span id="syncTimeBadge" class="bg-blue-200 text-blue-900 px-2 py-1 rounded text-xs font-semibold">لم يتم الجلب بعد</span>
                 </div>
 
                 <!-- Search & Filter Controls -->
@@ -598,29 +615,76 @@
                 <p class="text-xs text-gray-500 mt-1">الرجاء إدخال اسم المستخدم وكلمة السر لعرض السجل (admin/admin)</p>
             </div>
 
-            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+            <form onsubmit="handleAdminAuth(event)" class="space-y-4 text-right">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">اسم المستخدم</label>
-                    <input type="text" id="admin_user" required placeholder="admin" 
+                    <input type="text" id="adminUsername" required placeholder="admin" 
                         class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">كلمة السر</label>
-                    <input type="password" id="admin_pass" required placeholder="••••••••" 
+                    <input type="password" id="adminPassword" required placeholder="••••••••" 
                         class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
-                <div id="authErrorMessage" class="text-rose-600 text-xs font-bold hidden text-center">
+                <div id="authErrMsg" class="text-xs text-rose-600 font-bold hidden">
                     اسم المستخدم أو كلمة السر غير صحيحة!
                 </div>
                 <div class="flex gap-2 pt-2">
-                    <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl shadow text-sm transition">
+                    <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-2.5 rounded-xl text-sm transition shadow">
                         تسجيل الدخول
                     </button>
-                    <button type="button" onclick="cancelAdminLogin()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-sm transition">
+                    <button type="button" onclick="closeAdminAuthModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-sm transition">
                         إلغاء
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Google Script Config Modal -->
+    <div id="googleScriptModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 w-full max-w-lg shadow-2xl border border-gray-100 relative">
+            <div class="text-center mb-4">
+                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-2 text-indigo-700">
+                    <i class="fa-solid fa-link text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">ربط وحفظ البيانات تلقائياً في Google Sheet</h3>
+                <p class="text-xs text-gray-500 mt-1">يُقرأ التقرير مباشرة من رابط pubhtml/csv المرفق، ولإرسال التسجيلات الجديدة للشيت أدخل رابط Web App الخاص بك:</p>
+            </div>
+
+            <div class="space-y-4 text-right">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">رابط Google Apps Script Web App (اخترتي/اختياري):</label>
+                    <input type="url" id="googleScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" 
+                        class="w-full p-2.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 font-mono focus:outline-none">
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-gray-700 space-y-2">
+                    <p class="font-bold text-indigo-900"><i class="fa-solid fa-code ml-1"></i> كود Apps Script للحفظ المباشر تلقائياً:</p>
+                    <pre class="bg-slate-900 text-emerald-400 p-2 rounded text-[10px] overflow-x-auto font-mono dir-ltr text-left">
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([
+    new Date(), data.school_name, data.school_stage,
+    data.principal_name, data.principal_id, data.principal_phone, data.principal_qualification,
+    data.vice_name, data.vice_id, data.vice_phone, data.vice_qualification,
+    data.dev_name, data.dev_id, data.dev_phone, data.dev_position, data.dev_subject
+  ]);
+  return ContentService.createTextOutput(JSON.stringify({"result":"success"})).setMimeType(ContentService.MimeType.JSON);
+}
+                    </pre>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="saveGoogleScriptUrl()" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-2 rounded-xl text-sm transition">
+                        حفظ الإعدادات
+                    </button>
+                    <button type="button" onclick="closeGoogleScriptModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2 rounded-xl text-sm transition">
+                        إلغاء
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -632,12 +696,121 @@
 
     <script>
         let localDatabase = [];
+        let remoteDatabase = [];
         let zoomLevel = 1;
         let isAdminAuthenticated = false;
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnk0EAZg9hlBwXamZ7bNHEY0PBMDsffKMRlg9wBTNkdImU7gdxTX_U-toUu4JAV7XGAUTT0jKUtZi/pub?output=csv";
+
+        // Local Storage Helpers
+        function loadLocalData() {
+            try {
+                const data = localStorage.getItem('pdu_local_db');
+                if (data) localDatabase = JSON.parse(data);
+            } catch (e) {
+                console.error('Failed to load local storage:', e);
+                localDatabase = [];
+            }
+        }
+
+        function saveLocalData() {
+            try {
+                localStorage.setItem('pdu_local_db', JSON.stringify(localDatabase));
+            } catch (e) {
+                console.error('Failed to save to local storage:', e);
+            }
+        }
+
+        function clearLocalStorageData() {
+            if (confirm('هل أنت متأكد من مسح جميع البيانات المحلية المسجلة؟')) {
+                localDatabase = [];
+                saveLocalData();
+                renderReportTable();
+                showToast('تم مسح السجل المحلي بنجاح');
+            }
+        }
+
+        function lockAdminTab() {
+            isAdminAuthenticated = false;
+            switchTab('form');
+            showToast('تم قفل التقرير بنجاح');
+        }
+
+        function showAdminAuthModal() {
+            const modal = document.getElementById('adminAuthModal');
+            if (modal) modal.classList.remove('hidden');
+            const userIn = document.getElementById('adminUsername');
+            const passIn = document.getElementById('adminPassword');
+            if (userIn) userIn.value = '';
+            if (passIn) passIn.value = '';
+            const err = document.getElementById('authErrMsg');
+            if (err) err.classList.add('hidden');
+        }
+
+        function closeAdminAuthModal() {
+            const modal = document.getElementById('adminAuthModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleAdminAuth(e) {
+            if (e) e.preventDefault();
+            const user = document.getElementById('adminUsername').value.trim();
+            const pass = document.getElementById('adminPassword').value.trim();
+            if (user === 'admin' && pass === 'admin') {
+                isAdminAuthenticated = true;
+                closeAdminAuthModal();
+                switchTab('report');
+                showToast('تم تسجيل الدخول بنجاح كمدير للصفحة');
+            } else {
+                const err = document.getElementById('authErrMsg');
+                if (err) err.classList.remove('hidden');
+            }
+        }
+
+        function validateEgyptianID(input) {
+            const val = input.value.trim();
+            const errMsg = input.nextElementSibling;
+            const isValid = /^[23]\d{13}$/.test(val);
+            if (errMsg && errMsg.classList.contains('err-msg')) {
+                if (val.length > 0 && !isValid) {
+                    errMsg.classList.remove('hidden');
+                } else {
+                    errMsg.classList.add('hidden');
+                }
+            }
+        }
+
+        function validateEgyptianPhone(input) {
+            const val = input.value.trim();
+            const errMsg = input.nextElementSibling;
+            const isValid = /^01[0125]\d{8}$/.test(val);
+            if (errMsg && errMsg.classList.contains('err-msg')) {
+                if (val.length > 0 && !isValid) {
+                    errMsg.classList.remove('hidden');
+                } else {
+                    errMsg.classList.add('hidden');
+                }
+            }
+        }
+
+        function printPDF() {
+            window.print();
+        }
+
+        function resetForm() {
+            if (confirm('هل أنت متأكد من تفريغ كافة الحقول؟')) {
+                document.getElementById('dataForm').reset();
+                showToast('تم إفراغ كافة الحقول');
+            }
+        }
 
         // Initialize App on DOM Loaded
         window.addEventListener('DOMContentLoaded', () => {
             loadLocalData();
+            const savedScript = localStorage.getItem('google_script_app_url');
+            if (savedScript) {
+                const input = document.getElementById('googleScriptUrl');
+                if (input) input.value = savedScript;
+            }
         });
 
         // Tab Switching Logic with Authentication check
@@ -662,76 +835,78 @@
                 btnForm.classList.remove('active');
                 btnReport.classList.add('active');
                 renderReportTable();
+                fetchGoogleSheetData();
             }
         }
 
-        // Authentication Modal Logic
-        function showAdminAuthModal() {
-            document.getElementById('adminAuthModal').classList.remove('hidden');
-            document.getElementById('admin_user').value = '';
-            document.getElementById('admin_pass').value = '';
-            document.getElementById('authErrorMessage').classList.add('hidden');
-        }
+        // Fetch & Parse published Google Sheet CSV Data
+        async function fetchGoogleSheetData() {
+            const badge = document.getElementById('syncTimeBadge');
+            if (badge) badge.textContent = 'جاري المزامنة...';
 
-        function cancelAdminLogin() {
-            document.getElementById('adminAuthModal').classList.add('hidden');
-            switchTab('form');
-        }
-
-        function handleAdminLogin(e) {
-            e.preventDefault();
-            const u = document.getElementById('admin_user').value.trim();
-            const p = document.getElementById('admin_pass').value.trim();
-
-            if (u === 'admin' && p === 'admin') {
-                isAdminAuthenticated = true;
-                document.getElementById('adminAuthModal').classList.add('hidden');
-                switchTab('report');
-                showToast('تم تسجيل الدخول بنجاح لتقرير المدير');
-            } else {
-                document.getElementById('authErrorMessage').classList.remove('hidden');
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                if (!response.ok) throw new Error('تعذر الوصول إلى شيت جوجل');
+                const csvText = await response.text();
+                
+                remoteDatabase = parseCSVData(csvText);
+                if (badge) badge.textContent = `آخر تحديث: ${new Date().toLocaleTimeString('ar-EG')}`;
+                renderReportTable();
+                showToast(`تم جلب ${remoteDatabase.length} سجل من Google Sheet بنجاح`);
+            } catch (err) {
+                console.error(err);
+                if (badge) badge.textContent = 'فشلت المزامنة المباشرة';
+                showToast('تعذر الجلب المباشر من Google Sheet، سيتم عرض البيانات المحلية');
             }
         }
 
-        function lockAdminTab() {
-            isAdminAuthenticated = false;
-            switchTab('form');
-            showToast('تم قفل التقرير بنجاح');
+        // Simple CSV Parser
+        function parseCSVData(csv) {
+            const lines = csv.split('\n').filter(line => line.trim() !== '');
+            if (lines.length <= 1) return [];
+
+            const records = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
+                if (cols.length >= 5) {
+                    records.push({
+                        id: 'gs_' + i,
+                        timestamp: cols[0] || 'Google Sheet',
+                        school_name: cols[1] || cols[0] || '',
+                        school_stage: cols[2] || '',
+                        principal_name: cols[3] || '',
+                        principal_id: cols[4] || '',
+                        principal_phone: cols[5] || '',
+                        principal_qualification: cols[6] || '',
+                        vice_name: cols[7] || '',
+                        vice_id: cols[8] || '',
+                        vice_phone: cols[9] || '',
+                        vice_qualification: cols[10] || '',
+                        dev_name: cols[11] || '',
+                        dev_id: cols[12] || '',
+                        dev_phone: cols[13] || '',
+                        dev_position: cols[14] || '',
+                        dev_subject: cols[15] || '',
+                        isRemote: true
+                    });
+                }
+            }
+            return records;
         }
 
-        // Live Validation Functions for Egyptian Format
-        function validateEgyptianID(input) {
-            const regex = /^[23]\d{13}$/;
-            const errSpan = input.nextElementSibling;
-            if (input.value && !regex.test(input.value)) {
-                if (errSpan) errSpan.classList.remove('hidden');
-                input.setCustomValidity('رقم قومي غير صحيح');
-            } else {
-                if (errSpan) errSpan.classList.add('hidden');
-                input.setCustomValidity('');
-            }
+        function showGoogleScriptModal() {
+            document.getElementById('googleScriptModal').classList.remove('hidden');
         }
 
-        function validateEgyptianPhone(input) {
-            const regex = /^01[0125]\d{8}$/;
-            const errSpan = input.nextElementSibling;
-            if (input.value && !regex.test(input.value)) {
-                if (errSpan) errSpan.classList.remove('hidden');
-                input.setCustomValidity('رقم تليفون غير صحيح');
-            } else {
-                if (errSpan) errSpan.classList.add('hidden');
-                input.setCustomValidity('');
-            }
+        function closeGoogleScriptModal() {
+            document.getElementById('googleScriptModal').classList.add('hidden');
         }
 
-        function updateSchoolHeaderDisplay() {
-            const val = document.getElementById('school_name').value.trim();
-            const headerDisplay = document.getElementById('schoolTitleDisplay');
-            if (val) {
-                headerDisplay.textContent = val;
-            } else {
-                headerDisplay.textContent = '..................................................';
-            }
+        function saveGoogleScriptUrl() {
+            const url = document.getElementById('googleScriptUrl').value.trim();
+            localStorage.setItem('google_script_app_url', url);
+            closeGoogleScriptModal();
+            showToast('تم حفظ رابط الحفظ في Google Sheet بنجاح');
         }
 
         function handleFormSubmit(e) {
@@ -782,6 +957,17 @@
 
             localDatabase.unshift(newRecord);
             saveLocalData();
+
+            // Asynchronously post to Google Sheet Web App endpoint if configured
+            const scriptUrl = localStorage.getItem('google_script_app_url');
+            if (scriptUrl) {
+                fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newRecord)
+                }).catch(err => console.log('Sheet post error:', err));
+            }
             
             showToast('تم حفظ البيانات بنجاح! جاري فتح خيار طباعة/تحميل PDF...');
             
@@ -791,68 +977,33 @@
             }, 600);
         }
 
-        // Print PDF Logic optimized for A4 single page
-        function printPDF() {
-            switchTab('form');
-            setTimeout(() => {
-                window.print();
-            }, 150);
-        }
-
-        // Reset Form
-        function resetForm() {
-            document.getElementById('dataForm').reset();
-        }
-
-        // Reset Form
-        function resetForm() {
-            document.getElementById('dataForm').reset();
-            updateSchoolHeaderDisplay();
-        }
-
-        // Load & Save Data from LocalStorage
-        function loadLocalData() {
-            const stored = localStorage.getItem('professional_dev_records');
-            if (stored) {
-                try {
-                    localDatabase = JSON.parse(stored);
-                } catch (err) {
-                    localDatabase = [];
-                }
-            }
-        }
-
-        function saveLocalData() {
-            localStorage.setItem('professional_dev_records', JSON.stringify(localDatabase));
-        }
-
-        function clearLocalStorageData() {
-            if (confirm('هل أنت متأكد من مسح كافة سجلات التنمية المهنية المحفوظة؟')) {
-                localDatabase = [];
-                saveLocalData();
-                renderReportTable();
-                showToast('تم مسح السجل المحلي');
-            }
-        }
-
         function renderReportTable() {
             const tbody = document.getElementById('reportTableBody');
             const noDataMsg = document.getElementById('noDataMessage');
             tbody.innerHTML = '';
 
-            if (localDatabase.length === 0) {
+            const combinedData = [...localDatabase, ...remoteDatabase];
+
+            if (combinedData.length === 0) {
                 noDataMsg.classList.remove('hidden');
                 return;
             } else {
                 noDataMsg.classList.add('hidden');
             }
 
-            localDatabase.forEach((item, index) => {
+            combinedData.forEach((item, index) => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-blue-50/50 transition border-b border-gray-100';
+                tr.className = item.isRemote 
+                    ? 'bg-emerald-50/40 hover:bg-emerald-50 transition border-b border-gray-100' 
+                    : 'hover:bg-blue-50/50 transition border-b border-gray-100';
+                
+                const sourceBadge = item.isRemote 
+                    ? `<span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold mr-1">Google Sheet</span>`
+                    : `<span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-bold mr-1">محلي</span>`;
+
                 tr.innerHTML = `
                     <td class="p-3 font-bold text-gray-500">${index + 1}</td>
-                    <td class="p-3 font-bold text-blue-900">${escapeHTML(item.school_name)}</td>
+                    <td class="p-3 font-bold text-blue-900">${escapeHTML(item.school_name)} ${sourceBadge}</td>
                     <td class="p-3 text-gray-700">${escapeHTML(item.school_stage || '-')}</td>
                     <td class="p-3 font-medium text-gray-800">${escapeHTML(item.principal_name)}</td>
                     <td class="p-3 text-gray-700 font-mono">${escapeHTML(item.principal_phone)}</td>
@@ -861,12 +1012,10 @@
                     <td class="p-3 text-emerald-800 font-bold">${escapeHTML(item.dev_name)}</td>
                     <td class="p-3 text-gray-600">${escapeHTML(item.dev_subject)}</td>
                     <td class="p-3 text-center">
-                        <button onclick="loadRecordToForm(${item.id})" title="عرض واسترجاع بطباعة الاستمارة" class="text-blue-600 hover:text-blue-800 p-1">
+                        <button onclick="loadRecordToForm('${item.id}')" title="عرض واسترجاع بطباعة الاستمارة" class="text-blue-600 hover:text-blue-800 p-1">
                             <i class="fa-solid fa-file-export text-base"></i>
                         </button>
-                        <button onclick="deleteRecord(${item.id})" title="حذف" class="text-rose-500 hover:text-rose-700 p-1 mr-2">
-                            <i class="fa-solid fa-trash-can text-base"></i>
-                        </button>
+                        ${!item.isRemote ? `<button onclick="deleteRecord(${item.id})" title="حذف" class="text-rose-500 hover:text-rose-700 p-1 mr-2"><i class="fa-solid fa-trash-can text-base"></i></button>` : ''}
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -874,7 +1023,8 @@
         }
 
         function loadRecordToForm(id) {
-            const record = localDatabase.find(r => r.id === id);
+            const combined = [...localDatabase, ...remoteDatabase];
+            const record = combined.find(r => String(r.id) === String(id));
             if (!record) return;
 
             document.getElementById('school_name').value = record.school_name || '';
