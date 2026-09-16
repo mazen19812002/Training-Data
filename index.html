@@ -828,7 +828,27 @@ function doPost(e) {
         let remoteDatabase = [];
         let zoomLevel = 1;
         let isAdminAuthenticated = false;
-        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnk0EAZg9hlBwXamZ7bNHEY0PBMDsffKMRlg9wBTNkdImU7gdxTX_U-toUu4JAV7XGAUTT0jKUtZi/pub?output=csv";
+        const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAnk0EAZg9hlBwXamZ7bNHEY0PBMDsffKMRlg9wBTNkdImU7gdxTX_U-toUu4JAV7XGAUTT0jKUtZi/pubhtml?gid=0&single=true";
+
+        // Normalize Arabic digits to English digits
+        function convertArabicToEnglishDigits(str) {
+            if (!str) return '';
+            const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            return String(str).replace(/[٠-٩]/g, d => arabicDigits.indexOf(d));
+        }
+
+        // Convert any published Google Sheet URL into a direct CSV download link
+        function getCSVUrl(url) {
+            if (!url) return '';
+            let csvUrl = url.trim();
+            if (csvUrl.includes('/pubhtml')) {
+                csvUrl = csvUrl.replace('/pubhtml', '/pub');
+            }
+            if (csvUrl.includes('/pub') && !csvUrl.includes('output=csv')) {
+                csvUrl += (csvUrl.includes('?') ? '&' : '?') + 'output=csv';
+            }
+            return csvUrl;
+        }
 
         // Local Storage Helpers
         function loadLocalData() {
@@ -882,8 +902,13 @@ function doPost(e) {
 
         function handleAdminAuth(e) {
             if (e) e.preventDefault();
-            const user = document.getElementById('adminUsername').value.trim();
-            const pass = document.getElementById('adminPassword').value.trim();
+            let user = document.getElementById('adminUsername').value;
+            let pass = document.getElementById('adminPassword').value;
+
+            // Normalize Arabic digits & trim
+            user = convertArabicToEnglishDigits(user).trim().toLowerCase();
+            pass = convertArabicToEnglishDigits(pass).trim();
+
             if (user === 'admin' && pass === 'admin26') {
                 isAdminAuthenticated = true;
                 closeAdminAuthModal();
@@ -891,12 +916,16 @@ function doPost(e) {
                 showToast('تم تسجيل الدخول بنجاح كمدير للصفحة');
             } else {
                 const err = document.getElementById('authErrMsg');
-                if (err) err.classList.remove('hidden');
+                if (err) {
+                    err.textContent = 'اسم المستخدم أو كلمة السر غير صحيحة! (admin / admin26)';
+                    err.classList.remove('hidden');
+                }
             }
         }
 
         function validateEgyptianID(input) {
-            const val = input.value.trim();
+            const val = convertArabicToEnglishDigits(input.value.trim());
+            input.value = val;
             const errMsg = input.nextElementSibling;
             const isValid = /^[23]\d{13}$/.test(val);
             if (errMsg && errMsg.classList.contains('err-msg')) {
@@ -909,7 +938,8 @@ function doPost(e) {
         }
 
         function validateEgyptianPhone(input) {
-            const val = input.value.trim();
+            const val = convertArabicToEnglishDigits(input.value.trim());
+            input.value = val;
             const errMsg = input.nextElementSibling;
             const isValid = /^01[0125]\d{8}$/.test(val);
             if (errMsg && errMsg.classList.contains('err-msg')) {
@@ -968,36 +998,84 @@ function doPost(e) {
             }
         }
 
-        // Fetch & Parse published Google Sheet CSV Data
+        // Fetch & Parse published Google Sheet CSV Data with Proxy Fallback
         async function fetchGoogleSheetData() {
             const badge = document.getElementById('syncTimeBadge');
             if (badge) badge.textContent = 'جاري المزامنة...';
 
+            const pubUrl = localStorage.getItem('google_sheet_pub_url') || DEFAULT_SHEET_URL;
+            const csvUrl = getCSVUrl(pubUrl);
+
+            let csvText = '';
             try {
-                const response = await fetch(GOOGLE_SHEET_CSV_URL);
-                if (!response.ok) throw new Error('تعذر الوصول إلى شيت جوجل');
-                const csvText = await response.text();
-                
-                remoteDatabase = parseCSVData(csvText);
-                if (badge) badge.textContent = `آخر تحديث: ${new Date().toLocaleTimeString('ar-EG')}`;
-                renderReportTable();
-                showToast(`تم جلب ${remoteDatabase.length} سجل من Google Sheet بنجاح`);
-            } catch (err) {
-                console.error(err);
-                if (badge) badge.textContent = 'فشلت المزامنة المباشرة';
-                showToast('تعذر الجلب المباشر من Google Sheet، سيتم عرض البيانات المحلية');
+                // Primary fetch attempt
+                const response = await fetch(csvUrl);
+                if (!response.ok) throw new Error('Direct fetch failed');
+                csvText = await response.text();
+            } catch (err1) {
+                console.warn('Direct fetch failed, trying CORS proxy fallback...', err1);
+                try {
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(csvUrl)}`;
+                    const proxyResponse = await fetch(proxyUrl);
+                    if (!proxyResponse.ok) throw new Error('Proxy fetch failed');
+                    csvText = await proxyResponse.text();
+                } catch (err2) {
+                    console.error('All fetch attempts failed:', err2);
+                    if (badge) badge.textContent = 'فشلت المزامنة المباشرة';
+                    showToast('تعذر الجلب المباشر من Google Sheet، سيتم عرض البيانات المحلية');
+                    renderReportTable();
+                    return;
+                }
             }
+
+            remoteDatabase = parseCSVData(csvText);
+            if (badge) badge.textContent = `آخر تحديث: ${new Date().toLocaleTimeString('ar-EG')}`;
+            renderReportTable();
+            showToast(`تم جلب ${remoteDatabase.length} سجل من Google Sheet بنجاح`);
         }
 
-        // Simple CSV Parser
+        // Robust CSV Parser for Google Sheet Export
         function parseCSVData(csv) {
-            const lines = csv.split('\n').filter(line => line.trim() !== '');
+            if (!csv) return [];
+            const lines = [];
+            let row = [''];
+            let inQuotes = false;
+
+            for (let i = 0; i < csv.length; i++) {
+                const c = csv[i];
+                const nextC = csv[i + 1];
+
+                if (c === '"') {
+                    if (inQuotes && nextC === '"') {
+                        row[row.length - 1] += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (c === ',' && !inQuotes) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && nextC === '\n') {
+                        i++;
+                    }
+                    if (row.length > 1 || row[0] !== '') {
+                        lines.push(row);
+                    }
+                    row = [''];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== '') {
+                lines.push(row);
+            }
+
             if (lines.length <= 1) return [];
 
             const records = [];
             for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
-                if (cols.length >= 5) {
+                const cols = lines[i].map(c => c.trim());
+                if (cols.length >= 3) {
                     records.push({
                         id: 'gs_' + i,
                         timestamp: cols[0] || 'Google Sheet',
