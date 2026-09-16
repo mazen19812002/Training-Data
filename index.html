@@ -326,25 +326,154 @@
                         <div class="mt-2 mb-4 text-right flex flex-wrap items-center gap-2 bg-blue-50/70 p-3 rounded-xl border border-blue-200">
                             <span class="text-base sm:text-lg font-bold text-gray-900 whitespace-nowrap">السيد مدير مدرسة /</span>
                             <div class="flex-1 min-w-[220px]">
-                                <input type="text" id="school_name" list="schoolOptions" required placeholder="ادخل اسم المدرسة..." 
+                                <input type="text" id="school_name" list="schoolOptions" required placeholder="ابحث أو اختر اسم المدرسة..." 
                                     class="input-print-field w-full p-2 text-base sm:text-lg font-bold text-blue-900 border-b-2 border-dashed border-blue-600 bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md">
                                 <datalist id="schoolOptions">
-                                    <option value="مدرسة الشهيد حمدي إبراهيم الإعدادية بنين"></option>
-                                    <option value="مدرسة الشهيد أحمد حسين الإعدادية بنات"></option>
-                                    <option value="مدرسة السلام التراعية التعليم الأساسي"></option>
-                                    <option value="مدرسة كفر الشيخ الثانوية بنين القديمة"></option>
-                                    <option value="مدرسة الشهيد السلام الثانوية بنين"></option>
-                                    <option value="مدرسة الثانوية بنات بكفر الشيخ"></option>
-                                    <option value="مدرسة علي عبدالشكور الرسمية لغات"></option>
-                                    <option value="مدرسة السعيدية الإبتدائية"></option>
-                                    <option value="مدرسة الزهراء الإبتدائية"></option>
-                                    <option value="مدرسة التجارة الثانوية بنين"></option>
-                                    <option value="مدرسة الصناعية المتقدمة 5 سنوات"></option>
-                                    <option value="مدرسة الوحدة العربية الإبتدائية"></option>
-                                    <option value="مدرسة النور للمكفوفين بكفر الشيخ"></option>
-                                    <option value="مدرسة الأمل للصم والبكم"></option>
-                                    <option value="مدرسة الروضة الإبتدائية"></option>
-                                    <option value="مدرسة الشهيد مصطفى سمير بدوي اللغات"></option>
+                                    <option value="ابو تمادة الابتدائية ق"></option>
+                                    <option value="ابو عمر (تعليم أساسي)"></option>
+                                    <option value="ابوتمادة الابتدائية ج"></option>
+                                    <option value="ابوطبل (تعليم أساسي)"></option>
+                                    <option value="ادريجه (تعليم أساسي)"></option>
+                                    <option value="اريمون الثانوية المشتركة"></option>
+                                    <option value="الاتحاد (الاعدادية)"></option>
+                                    <option value="الاتحاد الابتدائية"></option>
+                                    <option value="الاعدادية بنات ق"></option>
+                                    <option value="الامل للصم بكفرالشيخ"></option>
+                                    <option value="الإعدادية بنات القديمة"></option>
+                                    <option value="الأمل للصم والبكم (تربية خاصة)"></option>
+                                    <option value="الأمل للصم وضعاف السمع بكفر الشيخ"></option>
+                                    <option value="البطاخ الابتدائية المشتركة"></option>
+                                    <option value="التجارة بنات (ثانوي فني)"></option>
+                                    <option value="التجارة بنين (ثانوي فني)"></option>
+                                    <option value="التربيه الفكريه (تربية خاصة)"></option>
+                                    <option value="الثانويه الزراعية العسكريه بكفر الشيخ"></option>
+                                    <option value="الحديثة (تعليم أساسي)"></option>
+                                    <option value="الحمراوى (تعليم أساسي)"></option>
+                                    <option value="الحمراوى الابتدائية"></option>
+                                    <option value="الحمراوي (الفصل الواحد)"></option>
+                                    <option value="الخضيري (تعليم أساسي)"></option>
+                                    <option value="الدماطية (تعليم أساسي)"></option>
+                                    <option value="الدماطيه للتعليم الاساسى"></option>
+                                    <option value="الروضة (تعليم أساسي)"></option>
+                                    <option value="الروضة الخليلية (الفصل الواحد)"></option>
+                                    <option value="الزخرفية (ثانوي فني)"></option>
+                                    <option value="الزراعة 3 سنوات (ثانوي فني)"></option>
+                                    <option value="الزهراء الابتدائية"></option>
+                                    <option value="الزهور لغات"></option>
+                                    <option value="السعدى (تعليم أساسي)"></option>
+                                    <option value="السعيدية بنات ج"></option>
+                                    <option value="السعيدية بنات ق"></option>
+                                    <option value="السلام الابتدائية"></option>
+                                    <option value="السيوفى (تعليم أساسي)"></option>
+                                    <option value="الشمارقة (الاعدادية)"></option>
+                                    <option value="الشمارقة الابتدائية"></option>
+                                    <option value="الشهداء ( الشهيد محمد ابراهيم ابو المجد) الابتدائية"></option>
+                                    <option value="الشهيد ابراهيم شمس الدين (الابتدائية)"></option>
+                                    <option value="الشهيد احمد فتحى العدوى الابتدائية"></option>
+                                    <option value="الشهيد أحمد السيد محمد ( اسحاقة ) (تعليم أساسي)"></option>
+                                    <option value="الشهيد أحمد سعد الديهى الثانوية فصول ملحقة"></option>
+                                    <option value="الشهيد أحمد سعد الديهي - شنو (الاعدادية)"></option>
+                                    <option value="الشهيد جميل العرابى ( اسحاقة ج ) الابتدائية"></option>
+                                    <option value="الشهيد حمدي (الاعدادية)"></option>
+                                    <option value="الشهيد عبد المنعم رياض الثانوية"></option>
+                                    <option value="الشهيد عزت الشافعي ( الثانوية بنات القديمة)"></option>
+                                    <option value="الشهيد محمد احمد قحوف (متبول (الاعدادية))"></option>
+                                    <option value="الشهيد محمد عزت ( الثانوية بنات ق )"></option>
+                                    <option value="الشهيد محمد قاسم عبد الوهاب تعليم اساسي"></option>
+                                    <option value="الشهيد مصطفى بدوي ( لغات رسمية )"></option>
+                                    <option value="الشهيد مصطفي هلال بالحمراوي الثانوية"></option>
+                                    <option value="الشهيد نبيل فراج (السعيدية مهني)"></option>
+                                    <option value="الشهيد نجيب محمد الشناوى بدقميرة (تعليم أساسي)"></option>
+                                    <option value="الشهيد هشام بركات (الثانوية بنات ج )"></option>
+                                    <option value="الصناعة بنات 3 سنوات (ثانوي فني)"></option>
+                                    <option value="الصناعي بنات الثانوية"></option>
+                                    <option value="الطايفة (الاعدادية)"></option>
+                                    <option value="الطايفة الابتدائية"></option>
+                                    <option value="الطفل المتطور"></option>
+                                    <option value="العونة (تعليم أساسي)"></option>
+                                    <option value="العونه (الفصل الواحد)"></option>
+                                    <option value="القرضا (الفصل الواحد)"></option>
+                                    <option value="القرضا (تعليم أساسي)"></option>
+                                    <option value="القنطرة الابتدائيه الجديده"></option>
+                                    <option value="القنطرة الابتدائية ج"></option>
+                                    <option value="القنطرة الابتدائية ق"></option>
+                                    <option value="المرابعين (تعليم أساسي)"></option>
+                                    <option value="المرابعين الثانوية"></option>
+                                    <option value="المعلم إبراهيم (ابو تماده (الاعدادية))"></option>
+                                    <option value="المنتزة (تعليم أساسي)"></option>
+                                    <option value="المنتزة لغات"></option>
+                                    <option value="المنتزه تعليم اساسي"></option>
+                                    <option value="النور للمكفوفين (تربية خاصة)"></option>
+                                    <option value="النور للمكفوفين (ع-ث)"></option>
+                                    <option value="الوحدة العربية الابتدائية"></option>
+                                    <option value="الوحده العربيه"></option>
+                                    <option value="امل كفر الشيخ"></option>
+                                    <option value="إبراهيم الشناوي الثانوية بنات بالحمراوي"></option>
+                                    <option value="إسكندر الابتدائية"></option>
+                                    <option value="بطيطة (الاعدادية)"></option>
+                                    <option value="بطيطة الابتدائية"></option>
+                                    <option value="بطيطة الثانوية"></option>
+                                    <option value="تجربية المعلمات الابتدائية"></option>
+                                    <option value="جمال عبدالناصر الابتدائية"></option>
+                                    <option value="حبيب عثمان (تعليم أساسي)"></option>
+                                    <option value="حسن كلبوش الثانوية بمسير"></option>
+                                    <option value="حسني زهرة بالحمراوي (الاعدادية)"></option>
+                                    <option value="حليس (تعليم أساسي)"></option>
+                                    <option value="حليس للتعليم الاساسي"></option>
+                                    <option value="دفرية (الاعدادية)"></option>
+                                    <option value="دفرية ج الابتدائية"></option>
+                                    <option value="دفرية ق الابتدائية"></option>
+                                    <option value="دقلت الابتدائية"></option>
+                                    <option value="دقلت (الاعدادية)"></option>
+                                    <option value="رزقة اماى الابتدائية"></option>
+                                    <option value="رزقه أماي (الاعدادية)"></option>
+                                    <option value="زراعه ميت علوان الثانويه"></option>
+                                    <option value="زراعه ميت علوان للتعليم الأساسي"></option>
+                                    <option value="سخا الابتدائية ج (السيد عبدة متولى علام )"></option>
+                                    <option value="سخا الابتدائية ق"></option>
+                                    <option value="سخا الالثانوية بنات"></option>
+                                    <option value="سخا النموذجية (تعليم أساسي)"></option>
+                                    <option value="سخا بنين (الاعدادية)"></option>
+                                    <option value="سخا لغات"></option>
+                                    <option value="سلام (تعليم أساسي)"></option>
+                                    <option value="سيدى جمال الابتدائية"></option>
+                                    <option value="شرمي (الفصل الواحد)"></option>
+                                    <option value="شنو الابتدائية ج –شمس الدين"></option>
+                                    <option value="شنو الابتدائية ق"></option>
+                                    <option value="شنو الفصول الملحقة الثانوية"></option>
+                                    <option value="شهيد السلام الثانوية"></option>
+                                    <option value="عبدالله السيد (تعليم أساسي)"></option>
+                                    <option value="عبدالله النحاس الابتدائية"></option>
+                                    <option value="عزبة خميس الابتدائية"></option>
+                                    <option value="عزبه اسكندر"></option>
+                                    <option value="على عبدالشكور (تعليم أساسي)"></option>
+                                    <option value="علي عبد الشكور الرسميه لغات"></option>
+                                    <option value="قراجة (تعليم أساسي)"></option>
+                                    <option value="قراجة الابتدائية – الشحات نصر غازي"></option>
+                                    <option value="كفر الشيخ الثانويه الصناعيه بنات"></option>
+                                    <option value="كفر الشيخ الثانويه بنات"></option>
+                                    <option value="كفر الطايفة (الاعدادية)"></option>
+                                    <option value="كفر المرابعين (تعليم أساسي)"></option>
+                                    <option value="كفر دفرية (تعليم أساسي)"></option>
+                                    <option value="كفرالشيخ الثانوية الزراعية العسكرية"></option>
+                                    <option value="كفرالطايفة الابتدائية"></option>
+                                    <option value="كفرعسكر الابتدائية"></option>
+                                    <option value="متبول ( الشهيد عبدالحميد فؤاد ) الابتدائية"></option>
+                                    <option value="مجمع اريمون (تعليم أساسي)"></option>
+                                    <option value="مجمع زراعة ميت علوان (تعليم أساسي)"></option>
+                                    <option value="محمود السيد شحاته الحشايش (تعليم أساسي)"></option>
+                                    <option value="مدرسه المنتزه الرسميه للغات"></option>
+                                    <option value="مدرسه مسير الابتدائيه الجديده"></option>
+                                    <option value="مسير (الفصل الواحد)"></option>
+                                    <option value="مسير الابتدائية"></option>
+                                    <option value="مسير بنين (الاعدادية)"></option>
+                                    <option value="مصطفى سمير بدوي للغات"></option>
+                                    <option value="منية مسير ( الشهيد عبداللاه ) الابتدائية"></option>
+                                    <option value="موجه علوم"></option>
+                                    <option value="ميزار (تعليم أساسي)"></option>
+                                    <option value="نصرة (تعليم أساسي)"></option>
+                                    <option value="نصره (الفصل الواحد)"></option>
+                                    <option value="وحدة مسير (تعليم أساسي)"></option>
                                 </datalist>
                             </div>
                             <span class="text-base sm:text-lg font-bold text-gray-900 whitespace-nowrap mr-2">المرحلة التعليمية /</span>
@@ -354,9 +483,9 @@
                                     <option value="رياض أطفال">رياض أطفال</option>
                                     <option value="ابتدائي">ابتدائي</option>
                                     <option value="إعدادي">إعدادي</option>
+                                    <option value="إعدادي مهني">إعدادي مهني</option>
                                     <option value="ثانوي عام">ثانوي عام</option>
                                     <option value="ثانوي فني">ثانوي فني</option>
-                                    <option value="متعددة المراحل">متعددة المراحل</option>
                                 </select>
                             </div>
                         </div>
@@ -612,7 +741,7 @@
                     <i class="fa-solid fa-user-lock text-2xl"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-900">دخول مدير الصفحة</h3>
-                <p class="text-xs text-gray-500 mt-1">الرجاء إدخال اسم المستخدم وكلمة السر لعرض السجل (admin/admin)</p>
+                <p class="text-xs text-gray-500 mt-1">الرجاء إدخال اسم المستخدم وكلمة السر لعرض السجل (admin / admin26)</p>
             </div>
 
             <form onsubmit="handleAdminAuth(event)" class="space-y-4 text-right">
@@ -654,7 +783,7 @@
 
             <div class="space-y-4 text-right">
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">رابط Google Apps Script Web App (اخترتي/اختياري):</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">رابط Google Apps Script Web App (اختياري):</label>
                     <input type="url" id="googleScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" 
                         class="w-full p-2.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 font-mono focus:outline-none">
                 </div>
@@ -755,7 +884,7 @@ function doPost(e) {
             if (e) e.preventDefault();
             const user = document.getElementById('adminUsername').value.trim();
             const pass = document.getElementById('adminPassword').value.trim();
-            if (user === 'admin' && pass === 'admin') {
+            if (user === 'admin' && pass === 'admin26') {
                 isAdminAuthenticated = true;
                 closeAdminAuthModal();
                 switchTab('report');
@@ -903,13 +1032,16 @@ function doPost(e) {
         }
 
         function saveGoogleScriptUrl() {
-            const url = document.getElementById('googleScriptUrl').value.trim();
-            localStorage.setItem('google_script_app_url', url);
+            const urlInput = document.getElementById('googleScriptUrl');
+            if (urlInput) {
+                const url = urlInput.value.trim();
+                localStorage.setItem('google_script_app_url', url);
+                showToast('تم حفظ رابط Google Apps Script بنجاح');
+            }
             closeGoogleScriptModal();
-            showToast('تم حفظ رابط الحفظ في Google Sheet بنجاح');
         }
 
-        function handleFormSubmit(e) {
+        async function handleFormSubmit(e) {
             e.preventDefault();
 
             const schoolName = document.getElementById('school_name').value.trim();
@@ -958,18 +1090,27 @@ function doPost(e) {
             localDatabase.unshift(newRecord);
             saveLocalData();
 
-            // Asynchronously post to Google Sheet Web App endpoint if configured
+            // Direct Sync to Google Sheet Web App Endpoint if configured
             const scriptUrl = localStorage.getItem('google_script_app_url');
             if (scriptUrl) {
-                fetch(scriptUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newRecord)
-                }).catch(err => console.log('Sheet post error:', err));
+                try {
+                    await fetch(scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newRecord)
+                    });
+                    showToast('تمت المزامنة مباشرة مع Google Sheet وحفظ البيانات محلياً');
+                } catch (err) {
+                    console.log('Sheet post error:', err);
+                    showToast('تم الحفظ محلياً وتأجلت المزامنة مع الشيت لحين استقرار الاتصال');
+                }
+            } else {
+                showToast('تم حفظ البيانات محلياً بنجاح!');
             }
-            
-            showToast('تم حفظ البيانات بنجاح! جاري فتح خيار طباعة/تحميل PDF...');
+
+            // Trigger fetch refresh to keep data updated
+            fetchGoogleSheetData();
             
             // Trigger automatic print workflow for current school
             setTimeout(() => {
