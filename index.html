@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استمارة بيانات وحدة التنمية المهنية</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #f0f9ff 100%);
+            --glass-bg: rgba(255, 255, 255, 0.88);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            --primary-blue: #0f4c81;
+            --secondary-blue: #1e3a8a;
+            --accent-green: #059669;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: #1e293b;
+            padding-bottom: 50px;
+            transition: zoom 0.2s ease-in-out;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .floating-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f4c81;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            background: #ffffff;
+            color: #2563eb;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 12px 12px 0 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: var(--primary-blue);
+            border-color: var(--glass-border);
+            border-bottom-color: #ffffff;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn:not(.active) {
+            background: rgba(255, 255, 255, 0.5);
+            color: #64748b;
+        }
+
+        .tab-btn:not(.active):hover {
+            background: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
+        }
+
+        .animated-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 38px;
+            background: linear-gradient(90deg, #1e3a8a, #0284c7, #0d9488);
+            background-size: 300% 300%;
+            animation: gradientShift 8s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-top: 1px solid rgba(255,255,255,0.4);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 4mm 6mm 4mm 6mm;
+            }
+
+            body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                color: #000 !important;
+                font-size: 10pt !important;
+            }
+
+            .no-print, .floating-controls, .animated-footer, .tab-nav, .controls-bar {
+                display: none !important;
+            }
+
+            .tab-content {
+                display: block !important;
+            }
+
+            #tab-form {
+                display: block !important;
+            }
+            #tab-report {
+                display: none !important;
+            }
+
+            .container-main {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+            }
+
+            .print-page-wrapper {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .print-header {
+                text-align: right;
+                margin-bottom: 4px;
+                line-height: 1.2;
+            }
+
+            .print-header h3 {
+                font-size: 11pt !important;
+                font-weight: bold;
+                margin: 1px 0;
+            }
+
+            .intro-block {
+                margin-bottom: 6px;
+                font-size: 9.5pt;
+                line-height: 1.3;
+                padding: 4px 8px !important;
+            }
+
+            .section-box {
+                background: transparent !important;
+                border: 1px solid #666 !important;
+                border-radius: 4px !important;
+                padding: 4px 8px !important;
+                margin-bottom: 4px !important;
+                box-shadow: none !important;
+            }
+
+            .section-title-print {
+                font-size: 10pt !important;
+                font-weight: bold !important;
+                margin-bottom: 3px !important;
+                color: #000 !important;
+                border-bottom: 1px solid #444 !important;
+                padding-bottom: 1px !important;
+            }
+
+            .grid-print {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 2px 10px !important;
+            }
+
+            .input-print-field, select.input-print-field {
+                border: none !important;
+                border-bottom: 1px dotted #333 !important;
+                background: transparent !important;
+                padding: 1px 3px !important;
+                font-size: 9.5pt !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                color: #000 !important;
+                height: auto !important;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+            }
+
+            label {
+                font-size: 9pt !important;
+                font-weight: bold !important;
+                color: #000 !important;
+                margin-bottom: 1px !important;
+            }
+
+            .instructions-print {
+                border: 1px solid #333 !important;
+                background: #f9f9f9 !important;
+                padding: 4px 8px !important;
+                font-size: 8.5pt !important;
+                border-radius: 4px !important;
+                margin-top: 4px !important;
+                line-height: 1.25 !important;
+            }
+
+            .signatures-print {
+                margin-top: 8px !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                padding: 0 20px !important;
+                font-size: 10pt !important;
+                font-weight: bold !important;
+            }
+
+            .section-box, .instructions-print, .signatures-print, .print-header {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-6">
+
+    <div class="floating-controls no-print" id="floatingControls">
+        <button class="control-btn" onclick="toggleFullscreen()" title="ملء الشاشة">
+            <i class="fa-solid fa-expand text-lg"></i>
+        </button>
+        <button class="control-btn" onclick="zoomIn()" title="تكبير العرض">
+            <i class="fa-solid fa-magnifying-glass-plus text-lg"></i>
+        </button>
+        <button class="control-btn" onclick="zoomOut()" title="تصغير العرض">
+            <i class="fa-solid fa-magnifying-glass-minus text-lg"></i>
+        </button>
+        <button class="control-btn" onclick="toggleUI()" title="إخفاء / إظهار شريط التحكم">
+            <i class="fa-solid fa-eye text-lg"></i>
+        </button>
+    </div>
+
+    <div class="max-w-5xl mx-auto container-main">
+
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-gray-300 mb-0 no-print tab-nav gap-2">
+            <button class="tab-btn active" id="tab-btn-form" onclick="switchTab('form')">
+                <i class="fa-solid fa-file-pen text-blue-600"></i>
+                استمارة إدخال البيانات والطباعة
+            </button>
+            <button class="tab-btn" id="tab-btn-report" onclick="switchTab('report')">
+                <i class="fa-solid fa-lock text-amber-600"></i>
+                التقرير لمدير الصفحة (سجل البيانات)
+            </button>
+        </div>
+
+        <!-- Main Card Wrapper -->
+        <div class="glass-card rounded-b-2xl sm:rounded-2xl p-4 sm:p-8 relative transition-all duration-300">
+
+            <!-- TAB 1: FORM & PRINT SECTION -->
+            <div id="tab-form" class="tab-content">
+                <div class="print-page-wrapper">
+                    
+                    <!-- Header Section -->
+                    <div class="print-header mb-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-xl font-bold text-blue-900">إدارة شرق كفرالشيخ التعليمية</h3>
+                                <h3 class="text-lg font-semibold text-blue-800">وحدة التنمية المهنية</h3>
+                            </div>
+                            <div class="text-left hidden sm:block no-print">
+                                <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1.5 rounded-full border border-blue-300">
+                                    <i class="fa-solid fa-shield-halved ml-1"></i> استمارة رسمية معتمدة
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Intro Text -->
+                    <div class="intro-block text-gray-800 mb-3 bg-white/50 p-3 rounded-lg border border-blue-100">
+                        <p class="text-center font-bold mb-1 text-blue-900">تحية طيبة وبعد ،،</p>
+                        <p class="text-justify text-sm sm:text-base leading-relaxed">
+                            كل عام وحضراتكم بخير وجعله الله عاماً دراسياً سعيداً ووفقكم الله وأعانكم على ما تحملون من أمانة.
+                            يرجى إرسال البيانات التالية معتمدة إلى وحدة التنمية المهنية بالإدارة وهي كالتالي:
+                        </p>
+                    </div>
+
+                    <!-- Input Form -->
+                    <form id="dataForm" onsubmit="handleFormSubmit(event)">
+
+                        <!-- School Name and Stage Header Line -->
+                        <div class="mt-2 mb-4 text-right flex flex-wrap items-center gap-2 bg-blue-50/70 p-3 rounded-xl border border-blue-200">
+                            <span class="text-base sm:text-lg font-bold text-gray-900 whitespace-nowrap">السيد مدير مدرسة /</span>
+                            <div class="flex-1 min-w-[220px]">
+                                <input type="text" id="school_name" list="schoolOptions" required placeholder="ادخل اسم المدرسة..." 
+                                    class="input-print-field w-full p-2 text-base sm:text-lg font-bold text-blue-900 border-b-2 border-dashed border-blue-600 bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md">
+                                <datalist id="schoolOptions">
+                                    <option value="مدرسة الشهيد حمدي إبراهيم الإعدادية بنين"></option>
+                                    <option value="مدرسة الشهيد أحمد حسين الإعدادية بنات"></option>
+                                    <option value="مدرسة السلام التراعية التعليم الأساسي"></option>
+                                    <option value="مدرسة كفر الشيخ الثانوية بنين القديمة"></option>
+                                    <option value="مدرسة الشهيد السلام الثانوية بنين"></option>
+                                    <option value="مدرسة الثانوية بنات بكفر الشيخ"></option>
+                                    <option value="مدرسة علي عبدالشكور الرسمية لغات"></option>
+                                    <option value="مدرسة السعيدية الإبتدائية"></option>
+                                    <option value="مدرسة الزهراء الإبتدائية"></option>
+                                    <option value="مدرسة التجارة الثانوية بنين"></option>
+                                    <option value="مدرسة الصناعية المتقدمة 5 سنوات"></option>
+                                    <option value="مدرسة الوحدة العربية الإبتدائية"></option>
+                                    <option value="مدرسة النور للمكفوفين بكفر الشيخ"></option>
+                                    <option value="مدرسة الأمل للصم والبكم"></option>
+                                    <option value="مدرسة الروضة الإبتدائية"></option>
+                                    <option value="مدرسة الشهيد مصطفى سمير بدوي اللغات"></option>
+                                </datalist>
+                            </div>
+                            <span class="text-base sm:text-lg font-bold text-gray-900 whitespace-nowrap mr-2">المرحلة التعليمية /</span>
+                            <div class="w-full sm:w-auto min-w-[160px]">
+                                <select id="school_stage" required class="input-print-field w-full p-2 text-base sm:text-lg font-bold text-blue-900 border-b-2 border-dashed border-blue-600 bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-md">
+                                    <option value="" disabled selected>-- اختر المرحلة --</option>
+                                    <option value="رياض أطفال">رياض أطفال</option>
+                                    <option value="ابتدائي">ابتدائي</option>
+                                    <option value="إعدادي">إعدادي</option>
+                                    <option value="ثانوي عام">ثانوي عام</option>
+                                    <option value="ثانوي فني">ثانوي فني</option>
+                                    <option value="متعددة المراحل">متعددة المراحل</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="section-box bg-white/60 p-4 rounded-xl mb-4 border border-blue-100">
+                            <h2 class="section-title-print text-lg font-bold text-blue-900 border-b pb-1 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-user-tie text-blue-600 no-print"></i>
+                                أولاً: بيانات مدير المدرسة
+                            </h2>
+                            <div class="grid-print grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">الاسم بالكامل</label>
+                                    <input type="text" id="principal_name" required autocomplete="name" placeholder="أدخل الاسم الرباعي" 
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">الرقم القومي (14 رقم - النظام المصري)</label>
+                                    <input type="text" id="principal_id" maxlength="14" pattern="^[23]\d{13}$" required placeholder="14 رقم قومي يبدأ بـ 2 أو 3" 
+                                        oninput="validateEgyptianID(this)"
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <span class="text-xs text-rose-600 hidden err-msg font-semibold mt-1">يجب أدخال رقم قومي مصري صحيح مكون من 14 رقم</span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">التليفون المحمول (11 رقم)</label>
+                                    <input type="tel" id="principal_phone" maxlength="11" pattern="^01[0125]\d{8}$" required placeholder="مثال: 01012345678" 
+                                        oninput="validateEgyptianPhone(this)"
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <span class="text-xs text-rose-600 hidden err-msg font-semibold mt-1">رقم تليفون مصري غير صحيح (يبدأ بـ 010, 011, 012, 015)</span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">المؤهل الدراسي</label>
+                                    <input type="text" id="principal_qualification" required placeholder="أدخل المؤهل الدراسي" 
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-box bg-white/60 p-4 rounded-xl mb-4 border border-blue-100">
+                            <h2 class="section-title-print text-lg font-bold text-blue-900 border-b pb-1 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-user-gear text-blue-600 no-print"></i>
+                                ثانياً: بيانات وكيل المدرسة
+                            </h2>
+                            <div class="grid-print grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">الاسم بالكامل</label>
+                                    <input type="text" id="vice_name" required placeholder="أدخل الاسم الرباعي" 
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">الرقم القومي (14 رقم - النظام المصري)</label>
+                                    <input type="text" id="vice_id" maxlength="14" pattern="^[23]\d{13}$" required placeholder="14 رقم قومي يبدأ بـ 2 أو 3" 
+                                        oninput="validateEgyptianID(this)"
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <span class="text-xs text-rose-600 hidden err-msg font-semibold mt-1">يجب أدخال رقم قومي مصري صحيح مكون من 14 رقم</span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">التليفون المحمول (11 رقم)</label>
+                                    <input type="tel" id="vice_phone" maxlength="11" pattern="^01[0125]\d{8}$" required placeholder="مثال: 01012345678" 
+                                        oninput="validateEgyptianPhone(this)"
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <span class="text-xs text-rose-600 hidden err-msg font-semibold mt-1">رقم تليفون مصري غير صحيح (يبدأ بـ 010, 011, 012, 015)</span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">المؤهل الدراسي</label>
+                                    <input type="text" id="vice_qualification" required placeholder="أدخل المؤهل الدراسي" 
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-box bg-white/60 p-4 rounded-xl mb-4 border border-blue-100">
+                            <h2 class="section-title-print text-lg font-bold text-blue-900 border-b pb-1 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-user-check text-blue-600 no-print"></i>
+                                ثالثاً: بيانات مسئول التنمية المهنية بالمدرسة
+                            </h2>
+                            <div class="grid-print grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">الاسم بالكامل</label>
+                                    <input type="text" id="dev_name" required placeholder="أدخل الاسم الرباعي" 
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">الرقم القومي (14 رقم - النظام المصري)</label>
+                                    <input type="text" id="dev_id" maxlength="14" pattern="^[23]\d{13}$" required placeholder="14 رقم قومي يبدأ بـ 2 أو 3" 
+                                        oninput="validateEgyptianID(this)"
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <span class="text-xs text-rose-600 hidden err-msg font-semibold mt-1">يجب أدخال رقم قومي مصري صحيح مكون من 14 رقم</span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">التليفون المحمول (11 رقم)</label>
+                                    <input type="tel" id="dev_phone" maxlength="11" pattern="^01[0125]\d{8}$" required placeholder="مثال: 01012345678" 
+                                        oninput="validateEgyptianPhone(this)"
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                    <span class="text-xs text-rose-600 hidden err-msg font-semibold mt-1">رقم تليفون مصري غير صحيح (يبدأ بـ 010, 011, 012, 015)</span>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700">الوظيفة على الكادر</label>
+                                    <input type="text" id="dev_position" required placeholder="مثال: معلم أول أ" 
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-sm font-bold text-gray-700">مادة التخصص</label>
+                                    <input type="text" id="dev_subject" required placeholder="أدخل مادة التخصص" 
+                                        class="input-print-field w-full p-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-white/90 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instructions Section -->
+                        <div class="instructions-print bg-amber-50/80 border border-amber-200 rounded-xl p-3 sm:p-4 mb-4 text-xs sm:text-sm text-amber-900 leading-snug">
+                            <ul class="space-y-1 list-none">
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-circle-check text-emerald-600 mt-1 no-print"></i>
+                                    <span>ترفق صورة طبق الأصل من تكليف مسئول التنمية المهنية والموقع عليها بالعلم.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <i class="fa-solid fa-circle-check text-emerald-600 mt-1 no-print"></i>
+                                    <span>في حالة المدارس المتعددة المراحل يتم استيفاء البيانات المطلوبة بشكل منفصل لكل مرحلة.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5 font-bold text-red-900">
+                                    <i class="fa-solid fa-clock text-red-600 mt-1 no-print"></i>
+                                    <span>تسلم البيانات المطلوبة إلى قسم التنمية المهنية بالإدارة في موعد أقصاه يوم الإثنين الموافق ٢١ / ٩ / ٢٠٢٦.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Signatures Section -->
+                        <div class="signatures-print flex justify-between items-center px-6 mt-6 pt-2 text-center text-sm sm:text-base font-bold text-blue-950">
+                            <div>
+                                <p>مدير إدارة التنمية المهنية</p>
+                                <p class="mt-4 text-gray-400">........................</p>
+                            </div>
+                            <div>
+                                <p>يعتمد ،،</p>
+                                <p class="text-blue-900">مدير عام الإدارة</p>
+                                <p class="mt-4 text-gray-400">........................</p>
+                            </div>
+                        </div>
+
+                        <!-- Form Action Buttons -->
+                        <div class="controls-bar mt-8 flex flex-wrap justify-center gap-4 no-print border-t pt-4">
+                            <button type="submit" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg transform hover:-translate-y-0.5 transition duration-200 flex items-center gap-2 text-base">
+                                <i class="fa-solid fa-paper-plane text-lg"></i>
+                                إرسال وطباعة PDF بيانات المدرسة
+                            </button>
+
+                            <button type="button" onclick="printPDF()" class="bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold px-6 py-3 rounded-xl shadow-lg transform hover:-translate-y-0.5 transition duration-200 flex items-center gap-2 text-base">
+                                <i class="fa-solid fa-print text-lg"></i>
+                                طباعة الاستمارة الحالية
+                            </button>
+
+                            <button type="button" onclick="resetForm()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-5 py-3 rounded-xl transition duration-200 flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                                إفراغ الحقول
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB 2: MANAGER REPORT & SECURED GOOGLE SHEETS DATA -->
+            <div id="tab-report" class="tab-content hidden">
+                <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-blue-950 flex items-center gap-2">
+                            <i class="fa-solid fa-folder-open text-emerald-600"></i>
+                            تقرير مدير الصفحة - سجل بيانات التنمية المهنية
+                        </h2>
+                        <p class="text-sm text-gray-600 mt-1">
+                            عرض واسترجاع كافة البيانات المسجلة محلياً والمزامنة مع السجل الرئيسي.
+                        </p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="lockAdminTab()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition">
+                            <i class="fa-solid fa-lock"></i>
+                            قفل التقرير
+                        </button>
+                        <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition">
+                            <i class="fa-solid fa-file-excel"></i>
+                            تصدير Excel (CSV)
+                        </button>
+                        <button onclick="clearLocalStorageData()" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold px-3 py-2 rounded-lg text-xs transition">
+                            <i class="fa-solid fa-trash"></i>
+                            مسح السجل المحلي
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search & Filter Controls -->
+                <div class="mb-4 flex items-center gap-3">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-gray-400"></i>
+                        <input type="text" id="reportSearch" onkeyup="filterReportTable()" placeholder="ابحث باسم المدرسة، المدير، الوكيل، أو مسئول التنمية المهنية..." 
+                            class="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm">
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <table class="w-full text-right border-collapse text-xs sm:text-sm" id="reportTable">
+                        <thead class="bg-gray-100 text-gray-700 font-bold border-b border-gray-200">
+                            <tr>
+                                <th class="p-3">#</th>
+                                <th class="p-3">المدرسة</th>
+                                <th class="p-3">المرحلة</th>
+                                <th class="p-3">مدير المدرسة</th>
+                                <th class="p-3">تليفون المدير</th>
+                                <th class="p-3">وكيل المدرسة</th>
+                                <th class="p-3">تليفون الوكيل</th>
+                                <th class="p-3">مسئول التنمية المهنية</th>
+                                <th class="p-3">تخصص التنمية</th>
+                                <th class="p-3 text-center">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportTableBody" class="divide-y divide-gray-100">
+                            <!-- Dynamic Rows Injected Here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noDataMessage" class="hidden text-center py-8 text-gray-500 font-semibold">
+                    لا توجد بيانات مسجلة حالياً في سجل التنمية المهنية.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminAuthModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-100 relative">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-800">
+                    <i class="fa-solid fa-user-lock text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">دخول مدير الصفحة</h3>
+                <p class="text-xs text-gray-500 mt-1">الرجاء إدخال اسم المستخدم وكلمة السر لعرض السجل (admin/admin)</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">اسم المستخدم</label>
+                    <input type="text" id="admin_user" required placeholder="admin" 
+                        class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">كلمة السر</label>
+                    <input type="password" id="admin_pass" required placeholder="••••••••" 
+                        class="w-full p-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div id="authErrorMessage" class="text-rose-600 text-xs font-bold hidden text-center">
+                    اسم المستخدم أو كلمة السر غير صحيحة!
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2.5 rounded-xl shadow text-sm transition">
+                        تسجيل الدخول
+                    </button>
+                    <button type="button" onclick="cancelAdminLogin()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-xl text-sm transition">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="animated-footer no-print">
+        <p class="text-xs sm:text-sm font-bold text-white tracking-wide drop-shadow-sm px-2 text-center">
+            وحدة التنمية المهنية - إدارة شرق كفرالشيخ التعليمية
+        </p>
+    </footer>
+
+    <script>
+        let localDatabase = [];
+        let zoomLevel = 1;
+        let isAdminAuthenticated = false;
+
+        // Initialize App on DOM Loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLocalData();
+        });
+
+        // Tab Switching Logic with Authentication check
+        function switchTab(tabName) {
+            const formTab = document.getElementById('tab-form');
+            const reportTab = document.getElementById('tab-report');
+            const btnForm = document.getElementById('tab-btn-form');
+            const btnReport = document.getElementById('tab-btn-report');
+
+            if (tabName === 'form') {
+                formTab.classList.remove('hidden');
+                reportTab.classList.add('hidden');
+                btnForm.classList.add('active');
+                btnReport.classList.remove('active');
+            } else if (tabName === 'report') {
+                if (!isAdminAuthenticated) {
+                    showAdminAuthModal();
+                    return;
+                }
+                formTab.classList.add('hidden');
+                reportTab.classList.remove('hidden');
+                btnForm.classList.remove('active');
+                btnReport.classList.add('active');
+                renderReportTable();
+            }
+        }
+
+        // Authentication Modal Logic
+        function showAdminAuthModal() {
+            document.getElementById('adminAuthModal').classList.remove('hidden');
+            document.getElementById('admin_user').value = '';
+            document.getElementById('admin_pass').value = '';
+            document.getElementById('authErrorMessage').classList.add('hidden');
+        }
+
+        function cancelAdminLogin() {
+            document.getElementById('adminAuthModal').classList.add('hidden');
+            switchTab('form');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('admin_user').value.trim();
+            const p = document.getElementById('admin_pass').value.trim();
+
+            if (u === 'admin' && p === 'admin') {
+                isAdminAuthenticated = true;
+                document.getElementById('adminAuthModal').classList.add('hidden');
+                switchTab('report');
+                showToast('تم تسجيل الدخول بنجاح لتقرير المدير');
+            } else {
+                document.getElementById('authErrorMessage').classList.remove('hidden');
+            }
+        }
+
+        function lockAdminTab() {
+            isAdminAuthenticated = false;
+            switchTab('form');
+            showToast('تم قفل التقرير بنجاح');
+        }
+
+        // Live Validation Functions for Egyptian Format
+        function validateEgyptianID(input) {
+            const regex = /^[23]\d{13}$/;
+            const errSpan = input.nextElementSibling;
+            if (input.value && !regex.test(input.value)) {
+                if (errSpan) errSpan.classList.remove('hidden');
+                input.setCustomValidity('رقم قومي غير صحيح');
+            } else {
+                if (errSpan) errSpan.classList.add('hidden');
+                input.setCustomValidity('');
+            }
+        }
+
+        function validateEgyptianPhone(input) {
+            const regex = /^01[0125]\d{8}$/;
+            const errSpan = input.nextElementSibling;
+            if (input.value && !regex.test(input.value)) {
+                if (errSpan) errSpan.classList.remove('hidden');
+                input.setCustomValidity('رقم تليفون غير صحيح');
+            } else {
+                if (errSpan) errSpan.classList.add('hidden');
+                input.setCustomValidity('');
+            }
+        }
+
+        function updateSchoolHeaderDisplay() {
+            const val = document.getElementById('school_name').value.trim();
+            const headerDisplay = document.getElementById('schoolTitleDisplay');
+            if (val) {
+                headerDisplay.textContent = val;
+            } else {
+                headerDisplay.textContent = '..................................................';
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const schoolName = document.getElementById('school_name').value.trim();
+            const pId = document.getElementById('principal_id').value.trim();
+            const vId = document.getElementById('vice_id').value.trim();
+            const dId = document.getElementById('dev_id').value.trim();
+
+            const pPhone = document.getElementById('principal_phone').value.trim();
+            const vPhone = document.getElementById('vice_phone').value.trim();
+            const dPhone = document.getElementById('dev_phone').value.trim();
+
+            // Validate Egyptian Patterns
+            if (!/^[23]\d{13}$/.test(pId) || !/^[23]\d{13}$/.test(vId) || !/^[23]\d{13}$/.test(dId)) {
+                showToast('يرجى التأكد من صحة الأرقام القومية (14 رقم تبدأ بـ 2 أو 3)');
+                return;
+            }
+
+            if (!/^01[0125]\d{8}$/.test(pPhone) || !/^01[0125]\d{8}$/.test(vPhone) || !/^01[0125]\d{8}$/.test(dPhone)) {
+                showToast('يرجى التأكد من صحة أرقام الهواتف المحمولة المصرية (11 رقم)');
+                return;
+            }
+
+            const newRecord = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('ar-EG'),
+                school_name: schoolName,
+                school_stage: document.getElementById('school_stage').value,
+
+                principal_name: document.getElementById('principal_name').value.trim(),
+                principal_id: pId,
+                principal_phone: pPhone,
+                principal_qualification: document.getElementById('principal_qualification').value,
+                
+                vice_name: document.getElementById('vice_name').value.trim(),
+                vice_id: vId,
+                vice_phone: vPhone,
+                vice_qualification: document.getElementById('vice_qualification').value,
+
+                dev_name: document.getElementById('dev_name').value.trim(),
+                dev_id: dId,
+                dev_phone: dPhone,
+                dev_position: document.getElementById('dev_position').value,
+                dev_subject: document.getElementById('dev_subject').value.trim(),
+            };
+
+            localDatabase.unshift(newRecord);
+            saveLocalData();
+            
+            showToast('تم حفظ البيانات بنجاح! جاري فتح خيار طباعة/تحميل PDF...');
+            
+            // Trigger automatic print workflow for current school
+            setTimeout(() => {
+                printPDF();
+            }, 600);
+        }
+
+        // Print PDF Logic optimized for A4 single page
+        function printPDF() {
+            switchTab('form');
+            setTimeout(() => {
+                window.print();
+            }, 150);
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('dataForm').reset();
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('dataForm').reset();
+            updateSchoolHeaderDisplay();
+        }
+
+        // Load & Save Data from LocalStorage
+        function loadLocalData() {
+            const stored = localStorage.getItem('professional_dev_records');
+            if (stored) {
+                try {
+                    localDatabase = JSON.parse(stored);
+                } catch (err) {
+                    localDatabase = [];
+                }
+            }
+        }
+
+        function saveLocalData() {
+            localStorage.setItem('professional_dev_records', JSON.stringify(localDatabase));
+        }
+
+        function clearLocalStorageData() {
+            if (confirm('هل أنت متأكد من مسح كافة سجلات التنمية المهنية المحفوظة؟')) {
+                localDatabase = [];
+                saveLocalData();
+                renderReportTable();
+                showToast('تم مسح السجل المحلي');
+            }
+        }
+
+        function renderReportTable() {
+            const tbody = document.getElementById('reportTableBody');
+            const noDataMsg = document.getElementById('noDataMessage');
+            tbody.innerHTML = '';
+
+            if (localDatabase.length === 0) {
+                noDataMsg.classList.remove('hidden');
+                return;
+            } else {
+                noDataMsg.classList.add('hidden');
+            }
+
+            localDatabase.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-blue-50/50 transition border-b border-gray-100';
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-gray-500">${index + 1}</td>
+                    <td class="p-3 font-bold text-blue-900">${escapeHTML(item.school_name)}</td>
+                    <td class="p-3 text-gray-700">${escapeHTML(item.school_stage || '-')}</td>
+                    <td class="p-3 font-medium text-gray-800">${escapeHTML(item.principal_name)}</td>
+                    <td class="p-3 text-gray-700 font-mono">${escapeHTML(item.principal_phone)}</td>
+                    <td class="p-3 text-gray-800">${escapeHTML(item.vice_name)}</td>
+                    <td class="p-3 text-gray-700 font-mono">${escapeHTML(item.vice_phone)}</td>
+                    <td class="p-3 text-emerald-800 font-bold">${escapeHTML(item.dev_name)}</td>
+                    <td class="p-3 text-gray-600">${escapeHTML(item.dev_subject)}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="loadRecordToForm(${item.id})" title="عرض واسترجاع بطباعة الاستمارة" class="text-blue-600 hover:text-blue-800 p-1">
+                            <i class="fa-solid fa-file-export text-base"></i>
+                        </button>
+                        <button onclick="deleteRecord(${item.id})" title="حذف" class="text-rose-500 hover:text-rose-700 p-1 mr-2">
+                            <i class="fa-solid fa-trash-can text-base"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function loadRecordToForm(id) {
+            const record = localDatabase.find(r => r.id === id);
+            if (!record) return;
+
+            document.getElementById('school_name').value = record.school_name || '';
+            document.getElementById('school_stage').value = record.school_stage || '';
+
+            document.getElementById('principal_name').value = record.principal_name || '';
+            document.getElementById('principal_id').value = record.principal_id || '';
+            document.getElementById('principal_phone').value = record.principal_phone || '';
+            document.getElementById('principal_qualification').value = record.principal_qualification || '';
+
+            document.getElementById('vice_name').value = record.vice_name || '';
+            document.getElementById('vice_id').value = record.vice_id || '';
+            document.getElementById('vice_phone').value = record.vice_phone || '';
+            document.getElementById('vice_qualification').value = record.vice_qualification || '';
+
+            document.getElementById('dev_name').value = record.dev_name || '';
+            document.getElementById('dev_id').value = record.dev_id || '';
+            document.getElementById('dev_phone').value = record.dev_phone || '';
+            document.getElementById('dev_position').value = record.dev_position || '';
+            document.getElementById('dev_subject').value = record.dev_subject || '';
+
+            switchTab('form');
+            showToast('تم تحميل بيانات المدرسة جاهزة للطباعة والتحميل');
+        }
+
+        function deleteRecord(id) {
+            if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+                localDatabase = localDatabase.filter(r => r.id !== id);
+                saveLocalData();
+                renderReportTable();
+                showToast('تم حذف السجل');
+            }
+        }
+
+        function filterReportTable() {
+            const q = document.getElementById('reportSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#reportTableBody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(q) ? '' : 'none';
+            });
+        }
+
+        // Export Data to CSV
+        function exportToCSV() {
+            if (localDatabase.length === 0) {
+                alert('لا توجد بيانات لتصديرها');
+                return;
+            }
+
+            let csvContent = "\uFEFF"; // UTF-8 BOM for Excel Arabic support
+            csvContent += "تاريخ التسجيل,اسم المدرسة,المرحلة,مدير المدرسة,الرقم القومي للمدير,تليفون المدير,مؤهل المدير,وكيل المدرسة,الرقم القومي للوكيل,تليفون الوكيل,مؤهل الوكيل,مسئول التنمية,الرقم القومي للتنمية,تليفون التنمية,وظيفة التنمية,تخصص التنمية\n";
+
+            localDatabase.forEach(r => {
+                const row = [
+                    `"${r.timestamp || ''}"`,
+                    `"${r.school_name || ''}"`,
+                    `"${r.school_stage || ''}"`,
+                    `"${r.principal_name || ''}"`,
+                    `"${r.principal_id || ''}"`,
+                    `"${r.principal_phone || ''}"`,
+                    `"${r.principal_qualification || ''}"`,
+                    `"${r.vice_name || ''}"`,
+                    `"${r.vice_id || ''}"`,
+                    `"${r.vice_phone || ''}"`,
+                    `"${r.vice_qualification || ''}"`,
+                    `"${r.dev_name || ''}"`,
+                    `"${r.dev_id || ''}"`,
+                    `"${r.dev_phone || ''}"`,
+                    `"${r.dev_position || ''}"`,
+                    `"${r.dev_subject || ''}"`
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `تقرير_بيانات_التنمية_المهنية_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-12 right-6 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl z-50 text-sm font-bold flex items-center gap-2 no-print transition transform duration-300';
+            toast.innerHTML = `<i class="fa-solid fa-circle-info text-emerald-400"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Screen Zoom and Fullscreen Functions
+        function zoomIn() {
+            zoomLevel += 0.05;
+            document.body.style.zoom = zoomLevel;
+        }
+
+        function zoomOut() {
+            if (zoomLevel > 0.6) {
+                zoomLevel -= 0.05;
+                document.body.style.zoom = zoomLevel;
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        function toggleUI() {
+            const controls = document.getElementById('floatingControls');
+            controls.style.opacity = controls.style.opacity === '0.2' ? '1' : '0.2';
+        }
+    </script>
+</body>
+</html>
